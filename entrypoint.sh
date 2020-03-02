@@ -39,3 +39,9 @@ docker buildx install
 
 cd "build/$(ls build | sed -n p)"
 docker build --platform $4 -t $IMAGE_FULL --push .
+
+# Propagate determined variables to the outer workflow
+echo ::set-output name=registry::$REGISTRY
+echo ::set-output name=org::$ORG
+echo ::set-output name=image::$IMAGE
+echo ::set-output name=tag::$TAG
