@@ -1,0 +1,26 @@
+# action.yml
+name: 'OpenFaaS build and push'
+description: 'Builds a docker image from your OpenFaaS function and pushes it to your registry'
+inputs:
+  stack-file:
+    description: 'The OpenFaaS function definition file'
+    required: true
+    default: 'stack.yml'
+  docker-username:
+    description: 'Your docker username with push authorization'
+    required: true
+  docker-password:
+    description: 'Your docker username with push authorization'
+    required: true
+  platforms:
+    description: 'the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7'
+    required: false
+    default: 'linux/amd64'
+outputs:
+  tag: # id of output
+    description: 'The image tag built'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.image }}
