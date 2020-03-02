@@ -26,6 +26,12 @@ else
 fi
 
 # For debugging purposes
+echo 1=$1
+echo 2=$2
+echo 3=$3
+echo 4=$4
+
+
 echo REGISTRY=$REGISTRY
 echo ORG=$ORG
 echo IMAGE=$IMAGE
