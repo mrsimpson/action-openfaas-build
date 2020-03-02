@@ -1,6 +1,9 @@
 # action.yml
 name: 'OpenFaaS build and push'
 description: 'Builds a docker image from your OpenFaaS function and pushes it to your registry'
+branding:
+  icon: upload-cloud
+  color: blue
 inputs:
   stack-file:
     description: 'The OpenFaaS function definition file'
