@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash
 
 # $1 stack-file
 # $2 docker-username
