@@ -16,18 +16,52 @@ jobs:
       env:
         REPOSITORY: ${{ github.repository }}
         SHA: ${{ github.sha	}}
-    - name: Test building multi-function stack - setup
+    - name: Move tests to root folder, subfolders are not supported in uses
+      run: |
+        mv ./test/* .
+    - name: Test building simple stack - setup
+      id: build-simple
       uses: './'
       with:
         # The OpenFaaS function definition file
-        stack-file: './test/multi-function.yml'
+        stack-file: './multi-function.yml'
         # Your docker username with push authorization
         docker-username: ${{ secrets.DOCKER_USERNAME }}
         # Your docker username with push authorization
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64,linux/arm/v7
-    - name: build image
+    - name: Test building multi-function stack - validate simple
+      run: |
+        print $(repo=mrsimpson/simple && \
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo simple"
+      env:
+        TAG: ${{ steps.outputs.build-simple.tag }}
+    - name: Test building multi-function stack - setup
+      id: build-multi
+      uses: './'
+      with:
+        # The OpenFaaS function definition file
+        stack-file: './multi-function.yml'
+        # Your docker username with push authorization
+        docker-username: ${{ secrets.DOCKER_USERNAME }}
+        # Your docker username with push authorization
+        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
+        platforms: linux/amd64
+    - name: Test building multi-function stack - validate first
+      run: |
+        print $(repo=mrsimpson/unit-test-first && \
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo first"
+      env:
+        TAG: ${{ steps.outputs.build-multi.tag }}
+    - name: Test building multi-function stack - validate second
+      run: |
+        print $(repo=mrsimpson/unit-test-second && \
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo second"
+      env:
+        TAG: ${{ steps.outputs.build-multi.tag }}
+    - name: Build action image
       run: |
         docker build -t ${IMAGE_NAME} .
     - name: publish to github registry
@@ -36,4 +70,3 @@ jobs:
         docker push "${IMAGE_NAME}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        

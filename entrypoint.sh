@@ -58,3 +58,6 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
 
     ((INDEX++))
 done
+
+# TAG is the same across all function builds
+echo ::set-output name=tag::$TAG

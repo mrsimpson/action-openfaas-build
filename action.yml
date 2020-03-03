@@ -20,12 +20,6 @@ inputs:
     required: false
     default: 'linux/amd64'
 outputs:
-  registry:
-    description: 'The registry pushed to'
-  org:
-    description: 'The organization the image belongs to'
-  image:
-    description: 'The image built'
   tag:
     description: 'The image tag built'
 runs:

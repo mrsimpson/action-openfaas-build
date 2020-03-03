@@ -6,5 +6,5 @@ functions:
   simple:
     lang: dockerfile
     handler: ./simple
-    image: mrsimpson/simple:latest
+    image: mrsimpson/unit-test-simple:latest
 
