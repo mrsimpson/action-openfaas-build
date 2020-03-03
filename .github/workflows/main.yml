@@ -22,7 +22,7 @@ jobs:
     - name: publish to github registry
       run: |
         docker login docker.pkg.github.com -u "${GITHUB_ACTOR}" -p "${GITHUB_TOKEN}" && \
-        docker push "docker.pkg.github.com/${IMAGE_NAME}"
+        docker push "${IMAGE_NAME}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
