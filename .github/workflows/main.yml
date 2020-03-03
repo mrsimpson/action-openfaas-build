@@ -17,7 +17,7 @@ jobs:
         REPOSITORY: ${{ github.repository }}
         SHA: ${{ github.sha	}}
     - name: Test building multi-function stack - setup
-      uses: '.'
+      uses: './'
       with:
         # The OpenFaaS function definition file
         stack-file: './test/multi-function.yml'
