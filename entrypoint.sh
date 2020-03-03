@@ -49,9 +49,14 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     echo $3 | docker login -u $2 --password-stdin $REGISTRY
 
     # Build and push
+
     cd "${FOLDER}"
-    DOCKER_BUILDKIT=1 docker build --platform $4 -t $IMAGE_FULL .
-    docker push $IMAGE_FULL
+    export DOCKER_CLI_EXPERIMENTAL=enabled
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    docker buildx create --use
+    docker buildx install
+    docker build --platform $4 -t $IMAGE_FULL --push .
+
     cd -
 
     ((INDEX++))
