@@ -16,6 +16,17 @@ jobs:
       env:
         REPOSITORY: ${{ github.repository }}
         SHA: ${{ github.sha	}}
+    - name: Test building multi-function stack - setup
+      uses: '.'
+      with:
+        # The OpenFaaS function definition file
+        stack-file: './test/multi-function.yml'
+        # Your docker username with push authorization
+        docker-username: ${{ secrets.DOCKER_USERNAME }}
+        # Your docker username with push authorization
+        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
+        platforms: linux/amd64,linux/arm/v7
     - name: build image
       run: |
         docker build -t ${IMAGE_NAME} .
