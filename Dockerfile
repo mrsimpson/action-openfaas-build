@@ -1,7 +1,13 @@
-FROM jonoh/docker-buildx-qemu:19.03.5_0.3.1
+ARG BUILDX_VERSION=19.03.5_0.3.1
+FROM jonoh/docker-buildx-qemu:${BUILDX_VERSION}
 
-# Install buildx as default
-RUN curl -sSL https://cli.openfaas.com | sh
+ARG FAAS_CLI_VERSION=0.11.8
+# Download FaaS CLI
+RUN curl -sLSf -o faas-cli https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli
+RUN curl -sLSf -o faas-cli.sig https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli.sha256
+
+RUN shasum -a 256 faas-cli -c faas-cli.sig 2>&1 | grep OK && \
+    mv faas-cli /usr/local/bin
 
 # Copies your code file from your action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh

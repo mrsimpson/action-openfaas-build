@@ -1,0 +1,28 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Determine Image
+      run: |
+        echo "::set-env name=IMAGE_NAME::$(echo "docker.pkg.github.com/${REPOSITORY}/action:${SHA}")"
+        echo "${IMAGE_NAME}"
+      env:
+        REPOSITORY: ${{ github.repository }}
+        SHA: ${{ github.sha	}}
+    - name: build image
+      run: |
+        docker build -t ${IMAGE_NAME} .
+    - name: publish to github registry
+      run: |
+        docker login docker.pkg.github.com -u "${GITHUB_ACTOR}" -p "${GITHUB_TOKEN}" && \
+        docker push "${IMAGE_NAME}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
