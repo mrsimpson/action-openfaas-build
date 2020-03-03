@@ -4,8 +4,9 @@ ARG FAAS_CLI_VERSION=0.11.8
 FROM jonoh/docker-buildx-qemu:${BUILDX_VERSION}
 
 # Download FaaS CLI
-RUN curl -sLSf -o faas-cli https://github.com/openfaas/faas-cli/releases/download/"$FAAS_CLI_VERSION"/faas-cli
-RUN curl -sLSf -o faas-cli.sig https://github.com/openfaas/faas-cli/releases/download/"$FAAS_CLI_VERSION"/faas-cli.sha256
+RUN echo ${FAAS_CLI_VERSION}
+RUN curl -sLSf -o faas-cli https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli
+RUN curl -sLSf -o faas-cli.sig https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli.sha256
 
 RUN shasum -a 256 faas-cli -c faas-cli.sig && \
     mv faas-cli /usr/local/bin
