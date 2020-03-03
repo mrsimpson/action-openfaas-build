@@ -26,11 +26,7 @@ else
 fi
 
 # For debugging purposes
-echo 1=$1
-echo 2=$2
-echo 3=$3
-echo 4=$4
-
+echo "All Arguments values:" $@
 
 echo REGISTRY=$REGISTRY
 echo ORG=$ORG
@@ -41,9 +37,11 @@ echo TAG=$TAG
 echo $3 | docker login -u $2 --password-stdin $REGISTRY
 
 # Build and push
-docker buildx install
 
 cd "build/$(ls build | sed -n p)"
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+docker buildx create --use
+docker buildx install
 docker build --platform $4 -t $IMAGE_FULL --push .
 
 # Propagate determined variables to the outer workflow
