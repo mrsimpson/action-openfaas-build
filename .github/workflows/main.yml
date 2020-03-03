@@ -9,13 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Determine Image
-      run: |
-        echo "::set-env name=IMAGE_NAME::$(echo "docker.pkg.github.com/${REPOSITORY}/action:${SHA}")"
-        echo "${IMAGE_NAME}"
-      env:
-        REPOSITORY: ${{ github.repository }}
-        SHA: ${{ github.sha	}}
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
         cp -Rf test/* .
@@ -37,6 +30,7 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
+#####################################################################
     - uses: actions/checkout@v2
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
@@ -65,7 +59,15 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
+#####################################################################
     - uses: actions/checkout@v2
+    - name: Determine Image
+      run: |
+        echo "::set-env name=IMAGE_NAME::$(echo "docker.pkg.github.com/${REPOSITORY}/action:${SHA}")"
+        echo "${IMAGE_NAME}"
+      env:
+        REPOSITORY: ${{ github.repository }}
+        SHA: ${{ github.sha	}}
     - name: Build action image
       run: |
         docker build -t ${IMAGE_NAME} .
