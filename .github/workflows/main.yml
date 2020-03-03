@@ -9,12 +9,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Determine Image
+      run: |
+        export IMAGE_NAME="${REPOSITORY}:${VERSION}" && \
+        echo "${IMAGE_NAME}"
     - name: build image
       run: |
-        docker build .
+        docker build -t ${IMAGE_NAME} .
     - name: publish to github registry
       run: |
         docker login docker.pkg.github.com -u "${GITHUB_ACTOR}" -p "${GITHUB_TOKEN}" && \
-        docker push
+        docker push ${IMAGE_NAME}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
+        SHA: ${{ github.sha	}}
+        
