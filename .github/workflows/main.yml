@@ -31,6 +31,7 @@ jobs:
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
 #####################################################################
+    - run: rm -rf .
     - uses: actions/checkout@v2
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
@@ -60,6 +61,7 @@ jobs:
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
 #####################################################################
+    - run: rm -rf .
     - uses: actions/checkout@v2
     - name: Determine Image
       run: |
