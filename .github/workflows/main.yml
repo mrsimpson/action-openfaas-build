@@ -19,25 +19,28 @@ jobs:
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
         cp -Rf test/* .
-    # deactivate simple test
-    # - name: Test building simple stack - setup
-    #   id: build-simple
-    #   uses: './'
-    #   with:
-    #     # The OpenFaaS function definition file
-    #     stack-file: './simple.yml'
-    #     # Your docker username with push authorization
-    #     docker-username: ${{ secrets.DOCKER_USERNAME }}
-    #     # Your docker username with push authorization
-    #     docker-password: ${{ secrets.DOCKER_PASSWORD }}
-    #     # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
-    #     platforms: linux/amd64,linux/arm/v7
-    # - name: Test building simple stack - validate
-    #   run: |
-    #     export repo=mrsimpson/unit-test-simple && \
-    #     curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
-    #   env:
-    #     TAG: ${{ steps.build-simple.outputs.tag }}
+    - name: Test building simple stack - setup
+      id: build-simple
+      uses: './'
+      with:
+        # The OpenFaaS function definition file
+        stack-file: './simple.yml'
+        # Your docker username with push authorization
+        docker-username: ${{ secrets.DOCKER_USERNAME }}
+        # Your docker username with push authorization
+        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
+        platforms: linux/amd64,linux/arm/v7
+    - name: Test building simple stack - validate
+      run: |
+        export repo=mrsimpson/unit-test-simple && \
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
+      env:
+        TAG: ${{ steps.build-simple.outputs.tag }}
+    - uses: actions/checkout@v2
+    - name: Move tests to root folder, subfolders are not supported in uses
+      run: |
+        cp -Rf test/* .
     - name: Test building multi-function stack - setup
       id: build-multi
       uses: './'
@@ -62,6 +65,7 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
+    - uses: actions/checkout@v2
     - name: Build action image
       run: |
         docker build -t ${IMAGE_NAME} .
