@@ -34,7 +34,7 @@ jobs:
     - name: Test building multi-function stack - validate simple
       run: |
         export repo=mrsimpson/simple && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo simple"
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.outputs.build-simple.tag }}
     - name: Test building multi-function stack - setup
@@ -52,13 +52,13 @@ jobs:
     - name: Test building multi-function stack - validate first
       run: |
         export repo=mrsimpson/unit-test-first && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo first"
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
       env:
         TAG: ${{ steps.outputs.build-multi.tag }}
     - name: Test building multi-function stack - validate second
       run: |
         export repo=mrsimpson/unit-test-second && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo second"
+        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.outputs.build-multi.tag }}
     - name: Build action image
