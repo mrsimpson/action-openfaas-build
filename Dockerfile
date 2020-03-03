@@ -1,10 +1,8 @@
 ARG BUILDX_VERSION=19.03.5_0.3.1
-ARG FAAS_CLI_VERSION=0.11.8
-
 FROM jonoh/docker-buildx-qemu:${BUILDX_VERSION}
 
+ARG FAAS_CLI_VERSION=0.11.8
 # Download FaaS CLI
-RUN echo ${FAAS_CLI_VERSION}
 RUN curl -sLSf -o faas-cli https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli
 RUN curl -sLSf -o faas-cli.sig https://github.com/openfaas/faas-cli/releases/download/${FAAS_CLI_VERSION}/faas-cli.sha256
 
