@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Determine Image
       run: |
-        echo "::set-env name=IMAGE_NAME::$(echo "docker.pkg.github.com/${REPOSITORY}:${SHA}/action")"
+        echo "::set-env name=IMAGE_NAME::$(echo "docker.pkg.github.com/${REPOSITORY}/action:${SHA}")"
         echo "${IMAGE_NAME}"
       env:
         REPOSITORY: ${{ github.repository }}
