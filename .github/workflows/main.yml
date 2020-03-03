@@ -13,6 +13,9 @@ jobs:
       run: |
         export IMAGE_NAME="${REPOSITORY}:${VERSION}" && \
         echo "${IMAGE_NAME}"
+      env:
+        REPOSITORY: ${{ github.repository }}
+        SHA: ${{ github.sha	}}
     - name: build image
       run: |
         docker build -t ${IMAGE_NAME} .
@@ -22,6 +25,4 @@ jobs:
         docker push ${IMAGE_NAME}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPOSITORY: ${{ github.repository }}
-        SHA: ${{ github.sha	}}
         
