@@ -12,3 +12,7 @@ jobs:
     - name: build image
       run: |
         docker build .
+    - name: publish to github registry
+      run: |
+        docker login docker.pkg.github.com -u "${GITHUB_ACTOR}" -p "${GITHUB_TOKEN}" && \
+        docker push
