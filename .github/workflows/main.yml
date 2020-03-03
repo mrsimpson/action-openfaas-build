@@ -36,7 +36,7 @@ jobs:
         export repo=mrsimpson/simple && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
-        TAG: ${{ steps.outputs.build-simple.tag }}
+        TAG: ${{ steps.build-simple.outputs.tag }}
     - name: Test building multi-function stack - setup
       id: build-multi
       uses: './'
@@ -54,13 +54,13 @@ jobs:
         export repo=mrsimpson/unit-test-first && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
       env:
-        TAG: ${{ steps.outputs.build-multi.tag }}
+        TAG: ${{ steps.build-multi.outputs.tag }}
     - name: Test building multi-function stack - validate second
       run: |
         export repo=mrsimpson/unit-test-second && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
-        TAG: ${{ steps.outputs.build-multi.tag }}
+        TAG: ${{ steps.build-multi.outputs.tag }}
     - name: Build action image
       run: |
         docker build -t ${IMAGE_NAME} .
