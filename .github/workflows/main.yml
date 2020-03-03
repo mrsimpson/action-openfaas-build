@@ -33,7 +33,7 @@ jobs:
         platforms: linux/amd64,linux/arm/v7
     - name: Test building multi-function stack - validate simple
       run: |
-        repo=mrsimpson/simple && curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo simple"
+        print $(repo=mrsimpson/simple && curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.outputs.build-simple.tag }}
     - name: Test building multi-function stack - setup
@@ -50,12 +50,12 @@ jobs:
         platforms: linux/amd64
     - name: Test building multi-function stack - validate first
       run: |
-        repo=mrsimpson/unit-test-first && curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo first"
+        print $(repo=mrsimpson/unit-test-first curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo first"
       env:
         TAG: ${{ steps.outputs.build-multi.tag }}
     - name: Test building multi-function stack - validate second
       run: |
-        repo=mrsimpson/unit-test-second && curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo second"
+        print $(repo=mrsimpson/unit-test-second curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}") | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.outputs.build-multi.tag }}
     - name: Build action image
