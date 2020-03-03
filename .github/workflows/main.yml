@@ -31,9 +31,9 @@ jobs:
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64,linux/arm/v7
-    - name: Test building multi-function stack - validate simple
+    - name: Test building simple stack - validate
       run: |
-        export repo=mrsimpson/simple && \
+        export repo=mrsimpson/unit-test-simple && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
