@@ -18,13 +18,13 @@ jobs:
         SHA: ${{ github.sha	}}
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
-        mv ./test/* .
+        cp -Rf test/* .
     - name: Test building simple stack - setup
       id: build-simple
       uses: './'
       with:
         # The OpenFaaS function definition file
-        stack-file: './multi-function.yml'
+        stack-file: './simple.yml'
         # Your docker username with push authorization
         docker-username: ${{ secrets.DOCKER_USERNAME }}
         # Your docker username with push authorization
