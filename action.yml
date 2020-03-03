@@ -13,7 +13,7 @@ inputs:
     description: 'Your docker username with push authorization'
     required: true
   docker-password:
-    description: 'Your docker username with push authorization'
+    description: 'Your docker password'
     required: true
   platforms:
     description: 'the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7'
