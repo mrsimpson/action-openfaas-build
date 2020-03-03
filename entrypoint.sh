@@ -50,8 +50,7 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
 
     # Build and push
     cd "${FOLDER}"
-    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    docker buildx create --name my-builder
+    docker buildx create --driver docker-container --name my-builder
     docker buildx use my-builder
     docker buildx install
     docker build --platform $4 -t $IMAGE_FULL --push .
