@@ -50,7 +50,8 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
 
     # Build and push
     cd "${FOLDER}"
-    DOCKER_BUILDKIT=1 docker build --platform $4 -t $IMAGE_FULL --push .
+    DOCKER_BUILDKIT=1 docker build --platform $4 -t $IMAGE_FULL .
+    docker push $IMAGE_FULL
     cd -
 
     ((INDEX++))
