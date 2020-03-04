@@ -59,13 +59,9 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     docker buildx create --use
     docker buildx install
     docker build --platform $4 -t $IMAGE_FULL --push .
-    echo here-1
     cd -
 
-    ((INDEX++))
+    INDEX=$((INDEX++))
 done
-echo here-2
 # TAG is the same across all function builds
 echo ::set-output name=tag::$TAG
-
-echo here-3
