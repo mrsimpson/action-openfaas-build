@@ -90,7 +90,9 @@ jobs:
         cd $GOPATH/src/github.com/openfaas && \
         git clone https://github.com/openfaas/faasd && \
         cd faasd && \
-        sudo faasd install && \
+        sudo faasd install
+    - name: Get OpenFaaS password
+      run: |
         echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
     - run: |
         cp -Rf test/* .
