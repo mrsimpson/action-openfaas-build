@@ -95,7 +95,8 @@ jobs:
       run: |
         for i in {1..10}
         do
-          if [ "$(sudo systemctl status faasd | grep 'running')" -eq 0 ]; then
+          GREP_RESULT=$(sudo systemctl status faasd | grep 'running')
+          if [ -z "$?" ]; then
             export RUNNING=true
             break
           fi
