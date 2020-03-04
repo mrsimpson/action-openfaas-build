@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 # $1 stack-file
 # $2 docker-username
 # $3 docker-password
@@ -12,8 +15,10 @@ SHRINKWRAP_MESSAGES_STRING=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep 
 mapfile -t SHRINKWRAP_MESSAGES <<< "$SHRINKWRAP_MESSAGES_STRING"
 mapfile -t BUILDING_MESSAGES <<< "$BUILDING_MESSAGES_STRING"
 
-INDEX=0
-for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
+for i in "${!BUILDING_MESSAGES[@]}"; do
+    SHRINKWRAP_MESSAGE=${SHRINKWRAP_MESSAGES[i]}
+    BUILDING_MESSAGE=${BUILDING_MESSAGES[i]}
+
     # Determine the components of the image by parsing the building message
     IMAGE_FULL=$(echo $BUILDING_MESSAGE | cut -d' ' -f2)
 
@@ -32,7 +37,6 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     fi
     
     # Get mapping to functions and directories
-    SHRINKWRAP_MESSAGE=${SHRINKWRAP_MESSAGES[INDEX]}
     FUNCTION=$(echo $SHRINKWRAP_MESSAGE | cut -d' ' -f1)
     FOLDER=$(echo $SHRINKWRAP_MESSAGE | cut -d' ' -f4)
     
@@ -56,11 +60,7 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     docker buildx create --use
     docker buildx install
     docker build --platform $4 -t $IMAGE_FULL --push .
-
     cd -
-
-    ((INDEX++))
 done
-
 # TAG is the same across all function builds
 echo ::set-output name=tag::$TAG
