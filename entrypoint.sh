@@ -55,7 +55,7 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     docker buildx create --use
     docker buildx install
-    docker build --platform $4 -t $IMAGE_FULL --push .
+    docker build --platform $4 -t $IMAGE_FULL --pusher .
 
     cd -
 
