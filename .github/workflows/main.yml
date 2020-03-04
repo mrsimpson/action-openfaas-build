@@ -83,7 +83,7 @@ jobs:
       run: |
         sudo apt update && \
         sudo apt install -qy runc bridge-utils tmux git && \
-        sudo curl -sSLf "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd-arm64" --output "/usr/local/bin/faasd" && \
+        sudo curl -fSLs "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd" --output "/usr/local/bin/faasd" && \
         sudo chmod a+x "/usr/local/bin/faasd" && \
         export GOPATH=$HOME/go/ && \
         mkdir -p $GOPATH/src/github.com/openfaas && \
