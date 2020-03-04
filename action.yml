@@ -49,3 +49,5 @@ runs:
     - ${{ inputs.platforms }}
     - ${{ inputs.deploy }}
     - ${{ inputs.gateway }}
+    - ${{ inputs.openfaas-username }}
+    - ${{ inputs.openfaas-password }}
