@@ -95,7 +95,7 @@ jobs:
       run: |
         for i in {1..10}
         do
-          if [ $(sudo systemctl status faasd | grep -c 'running') -eq 0 $(sudo systemctl status faasd-provider | grep -c 'running') -eq 0 ]; then
+          if [ $(sudo systemctl status faasd | grep -c 'running') -eq 0 && $(sudo systemctl status faasd-provider | grep -c 'running') -eq 0 ]; then
             export RUNNING=true
             break
           else 
@@ -122,8 +122,6 @@ jobs:
         gateway: http://localhost:8080
         openfaas-username: admin
         openfaas-password: $OPENFAAS_PASSWORD
-      env:
-        $OPENFAAS_PASSWORD: $OPENFAAS_PASSWORD
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
         curl -I http://admin:$OPENFAAS_PASSWORD@127.0.0.1:8080/system/function/simple
