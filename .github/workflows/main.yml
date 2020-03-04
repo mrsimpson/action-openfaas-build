@@ -1,6 +1,8 @@
 name: CI
 
 on: [push]
+env:
+  DOCKER_JWT: ""
 
 jobs:
 
