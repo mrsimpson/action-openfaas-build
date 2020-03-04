@@ -102,11 +102,6 @@ jobs:
           fi
           sleep 10s
         done
-        if [ "$RUNNING" ]; then
-          exit 0
-        else
-          exit 1
-        fi
     - name: Get OpenFaaS password
       run: |
         echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
