@@ -124,7 +124,7 @@ jobs:
         openfaas-password: $OPENFAAS_PASSWORD
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
-        curl http://localhost:8080/system/function/simple
+        curl http://admin:$OPENFAAS_PASSWORD@127.0.0.1:8080/system/function/simple
   
   build-and-buffer:
     runs-on: ubuntu-latest
