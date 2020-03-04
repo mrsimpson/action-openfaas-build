@@ -1,8 +1,6 @@
 name: CI
 
 on: [push]
-env:
-  DOCKER_JWT: ""
 
 jobs:
 
@@ -31,8 +29,12 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
-    - run: |
-        echo `::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ 'username': '${{ secrets.DOCKER_USERNAME }}', 'password': '${{ secrets.DOCKER_PASSWORD }}'}" "https://hub.docker.com/v2/users/login/" | jq -r .token)`
+    - name: Login to Dockerhub
+      run: |
+        echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: delete simple-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
@@ -70,6 +72,12 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
+    - name: Login to Dockerhub
+      run: |
+        echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: delete multi-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
