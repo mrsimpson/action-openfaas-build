@@ -100,7 +100,7 @@ jobs:
             export RUNNING=true
             break
           fi
-          sleep 5s
+          sleep 10s
         done
         if [ "$RUNNING" ]; then
           exit 0
