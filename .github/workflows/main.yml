@@ -23,18 +23,18 @@ jobs:
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64,linux/arm/v7
-    - name: Test execution
-      run: |
-        export repo=mrsimpson/unit-test-simple && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
-      env:
-        TAG: ${{ steps.build-simple.outputs.tag }}
     - name: Login to Dockerhub
       run: |
         echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Test execution
+      run: |
+        export repo=mrsimpson/unit-test-simple && \
+        curl -H "Authorization: JWT ${DOCKER_JWT}" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
+      env:
+        TAG: ${{ steps.build-simple.outputs.tag }}
     - name: delete simple-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
@@ -60,27 +60,28 @@ jobs:
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64
-    - name: Test execution - validate first
-      run: |
-        export repo=mrsimpson/unit-test-first && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
-      env:
-        TAG: ${{ steps.build-multi.outputs.tag }}
-    - name: Test execution - validate second
-      run: |
-        export repo=mrsimpson/unit-test-second && \
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
-      env:
-        TAG: ${{ steps.build-multi.outputs.tag }}
     - name: Login to Dockerhub
       run: |
         echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Test execution - validate first
+      run: |
+        export repo=mrsimpson/unit-test-first && \
+        curl -H "Authorization: JWT ${DOCKER_JWT}" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
+      env:
+        TAG: ${{ steps.build-multi.outputs.tag }}
+    - name: Test execution - validate second
+      run: |
+        export repo=mrsimpson/unit-test-second && \
+        curl -H "Authorization: JWT ${DOCKER_JWT}" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
+      env:
+        TAG: ${{ steps.build-multi.outputs.tag }}
     - name: delete multi-image
       run: |
-        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-first/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}" && \
+        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-second/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
   
