@@ -43,7 +43,7 @@ jobs:
       - run: |
           echo `::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ 'username': '${{ secrets.DOCKER_USERNAME }}', 'password': '${{ secrets.DOCKER_PASSWORD }}'}" "https://hub.docker.com/v2/users/login/" | jq -r .token)`
       - name: delete simple-image
-      - run: |
+        run: |
           curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
         env:
           TAG: ${{ steps.test-simple.outputs.tag }}
@@ -85,7 +85,7 @@ jobs:
     needs: [docker-auth, test-multi]
     steps:
       - name: delete multi-image
-      - run: |
+        run: |
           curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
         env:
           TAG: ${{ steps.test-multi.outputs.tag }}
