@@ -67,7 +67,7 @@ jobs:
         export repo=mrsimpson/unit-test-second && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
-        TAG: ${{ steps.build-simple.outputs.tag }}
+        TAG: ${{ steps.build-multi.outputs.tag }}
     - name: delete multi-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
