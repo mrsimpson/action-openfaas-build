@@ -27,13 +27,15 @@ jobs:
       run: |
         export repo=mrsimpson/unit-test-simple && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
+      env:
+        TAG: ${{ steps.build-simple.outputs.tag }}
     - run: |
         echo `::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ 'username': '${{ secrets.DOCKER_USERNAME }}', 'password': '${{ secrets.DOCKER_PASSWORD }}'}" "https://hub.docker.com/v2/users/login/" | jq -r .token)`
     - name: delete simple-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
-        env:
-          TAG: ${{ steps.build-simple.outputs.tag }}
+      env:
+        TAG: ${{ steps.build-simple.outputs.tag }}
 
   test-multi:
     runs-on: ubuntu-latest
@@ -64,6 +66,8 @@ jobs:
       run: |
         export repo=mrsimpson/unit-test-second && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
+      env:
+        TAG: ${{ steps.build-simple.outputs.tag }}
     - name: delete multi-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
