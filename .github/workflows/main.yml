@@ -8,20 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Move tests to root folder, subfolders are not supported in uses
-      run: |
+    - run: |
         cp -Rf test/* .
-    - name: Test setup
+    - name: Test setup - Build the function stack and deploy it
       id: build-simple
       uses: './'
       with:
-        # The OpenFaaS function definition file
         stack-file: './simple.yml'
-        # Your docker username with push authorization
         docker-username: ${{ secrets.DOCKER_USERNAME }}
-        # Your docker username with push authorization
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
-        # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64,linux/arm/v7
     - name: Test execution
       run: |
@@ -45,20 +40,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Move tests to root folder, subfolders are not supported in uses
-      run: |
+    - run: |
         cp -Rf test/* .
-    - name: Test setup
+    - name: Test setup - Build the function stack and deploy it
       id: build-multi
       uses: './'
       with:
-        # The OpenFaaS function definition file
         stack-file: './multi-function.yml'
-        # Your docker username with push authorization
         docker-username: ${{ secrets.DOCKER_USERNAME }}
-        # Your docker username with push authorization
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
-        # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64
     - name: Test execution - validate first
       run: |
@@ -84,8 +74,40 @@ jobs:
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-second/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
+
+  test-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install faasd
+      run: |
+        sudo apt update && \
+        sudo apt install -qy runc bridge-utils tmux git containerd && \
+        sudo curl -sSLf "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd-arm64" --output "/usr/local/bin/faasd" && \
+        sudo chmod a+x "/usr/local/bin/faasd" && \
+        export GOPATH=$HOME/go/ && \
+        mkdir -p $GOPATH/src/github.com/openfaas && \
+        cd $GOPATH/src/github.com/openfaas && \
+        git clone https://github.com/openfaas/faasd && \
+        cd faasd && \
+        sudo faasd install
+    - run: |
+        cp -Rf test/* .
+    - name: Test setup - Build the function stack and deploy it
+      id: build-simple
+      uses: './'
+      with:
+        stack-file: './simple.yml'
+        docker-username: ${{ secrets.DOCKER_USERNAME }}
+        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        platforms: linux/amd64
+        deploy: 1
+        gateway: http://localhost:8080
+    - name: Test execution - Check whether the function exists in OpenFaaS
+      run: |
+        curl http://localhost:8080/system/function/simple
   
-  build-and-push:
+  build-and-buffer:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

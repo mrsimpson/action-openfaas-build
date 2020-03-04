@@ -2,18 +2,28 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
- A [Github action](https://help.github.com/en/actions/getting-started-with-github-actions) for building OpenFaaS functions.
+![CI](https://github.com/mrsimpson/action-openfaas-build/workflows/CI/badge.svg)
+
+ A no-frills [Github action](https://help.github.com/en/actions/getting-started-with-github-actions) for building OpenFaaS functions.
 
 The function gets the image information from the function file.
 
+## Limitations
+
+No sophisticated optional parameters! The main pupose of this action is simplicity.
+Therefore, no other optional, non-functional parameters influencing the behaviour of `faas-cli` are going to be supported.
+If you really feel that you desperately need sommething, feel free to open an issue!
+
 ## Inputs
 
-| Parameter | effect   | default |
-| ----      |   ----   | ----    |
-| `stack-file` | The OpenFaaS function definition file | `stack.yml` |
-| `docker-username` | Your docker username with push authorization | |
-| `docker-password` | Your docker password | |
-| `platforms` | The platform abbreviations to build for, potentially comma-separated. e. g. `linux/amd64,linux/arm/v7` | `linux/amd64` |
+| Parameter | effect   | default | required |
+| ----      |   ----   | ----    | -----    |    
+| `stack-file` | The OpenFaaS function definition file | `stack.yml` | yes |
+| `docker-username` | Your docker username with push authorization | ❌ | yes |
+| `docker-password` | Your docker password | ❌ | yes |
+| `platforms` | The platform abbreviations to build for, potentially comma-separated. e. g. `linux/amd64,linux/arm/v7` | `linux/amd64` | yes |
+| `deploy` | Whether the built image shall be deployed | `0`=no, `1`=yes | no |
+| `gateway` | The gateway url override. Only has an effect, if `deploy=1` |  | no |
 
 ## Further links
 

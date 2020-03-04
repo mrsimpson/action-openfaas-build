@@ -19,6 +19,15 @@ inputs:
     description: 'the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7'
     required: false
     default: 'linux/amd64'
+  deploy:
+    description: 'Whether the built image shall be deployed (0=no, 1=yes)'
+    required: false
+    default: '0'
+  gateway:
+    description: 'The gateway url override'
+    required: false
+    default: '<fully qualified URL>'
+  
 outputs:
   tag:
     description: 'The image tag built'
