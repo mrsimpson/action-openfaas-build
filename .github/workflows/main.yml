@@ -93,10 +93,10 @@ jobs:
         sudo faasd install
     - name: Wait for OpenFaaS to be ready
       run: |
-        for i in {1..5}
+        for i in {1..10}
         do
           sudo systemctl status faasd
-          sleep 5s
+          sleep 10s
         done
     - name: Get OpenFaaS password
       run: |
