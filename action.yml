@@ -27,6 +27,14 @@ inputs:
     description: 'The gateway url override'
     required: false
     default: '<fully qualified URL>'
+  openfaas-username:
+    description: 'User for authenticating at OpenFaaS gateway'
+    required: false
+    default: 'admin'
+  openfaas-password:
+    description: 'Password for authenticating at OpenFaaS gateway'
+    required: false
+    default: 'admin'
   
 outputs:
   tag:
@@ -39,3 +47,5 @@ runs:
     - ${{ inputs.docker-username }}
     - ${{ inputs.docker-password }}
     - ${{ inputs.platforms }}
+    - ${{ inputs.deploy }}
+    - ${{ inputs.gateway }}

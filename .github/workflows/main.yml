@@ -82,7 +82,6 @@ jobs:
     - name: Install faasd
       run: |
         sudo apt update && \
-        sudo apt install -qy runc bridge-utils tmux git containerd && \
         sudo curl -sSLf "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd-arm64" --output "/usr/local/bin/faasd" && \
         sudo chmod a+x "/usr/local/bin/faasd" && \
         export GOPATH=$HOME/go/ && \
@@ -90,7 +89,8 @@ jobs:
         cd $GOPATH/src/github.com/openfaas && \
         git clone https://github.com/openfaas/faasd && \
         cd faasd && \
-        sudo faasd install
+        sudo faasd install && \
+        echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)
     - run: |
         cp -Rf test/* .
     - name: Test setup - Build the function stack and deploy it
@@ -103,6 +103,8 @@ jobs:
         platforms: linux/amd64
         deploy: 1
         gateway: http://localhost:8080
+        openfaas-username: admin
+        openfaas-password: $OPENFAAS_PASSWORD
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
         curl http://localhost:8080/system/function/simple

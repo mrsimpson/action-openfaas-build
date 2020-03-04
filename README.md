@@ -24,6 +24,8 @@ If you really feel that you desperately need sommething, feel free to open an is
 | `platforms` | The platform abbreviations to build for, potentially comma-separated. e. g. `linux/amd64,linux/arm/v7` | `linux/amd64` | yes |
 | `deploy` | Whether the built image shall be deployed | `0`=no, `1`=yes | no |
 | `gateway` | The gateway url override. Only has an effect, if `deploy=1` |  | no |
+| `openfaas-username` | User for authenticating at OpenFaaS gateway |  | no |
+| `openfaas-password`| Password for authenticating at OpenFaaS gateway |  | no |
 
 ## Further links
 
