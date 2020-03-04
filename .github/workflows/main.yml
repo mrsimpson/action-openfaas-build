@@ -91,6 +91,10 @@ jobs:
         git clone https://github.com/openfaas/faasd && \
         cd faasd && \
         sudo faasd install
+        
+        sudo systemctl stop faasd
+        sudo echo "admin" > /var/lib/faasd/secrets/basic-auth-password
+        sudo systemctl start faasd
     - name: Wait for OpenFaaS to be ready
       run: |
         for i in {1..10}
@@ -105,9 +109,9 @@ jobs:
           sleep 5s
         done
         $RUNNING && exit 0
-    - name: Get OpenFaaS password
+    - name: set OpenFaaS password
       run: |
-        echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
+        sudo echo "admin" > /var/lib/faasd/secrets/basic-auth-password
     - run: |
         cp -Rf test/* .
     - name: Test setup - Build the function stack and deploy it
@@ -121,12 +125,10 @@ jobs:
         deploy: 1
         gateway: http://localhost:8080
         openfaas-username: admin
-        openfaas-password: $OPENFAAS_PASSWORD
-      env:
-        OPENFAAS_PASSWORD: $OPENFAAS_PASSWORD
+        openfaas-password: admin
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
-        curl -I http://admin:$OPENFAAS_PASSWORD@127.0.0.1:8080/system/function/simple
+        curl -I http://admin:admin@127.0.0.1:8080/system/function/simple
   
   build-and-buffer:
     runs-on: ubuntu-latest
