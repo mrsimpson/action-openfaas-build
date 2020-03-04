@@ -3,7 +3,8 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+
+  test-simple:
 
     runs-on: ubuntu-latest
 
@@ -12,7 +13,7 @@ jobs:
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
         cp -Rf test/* .
-    - name: Test building simple stack - setup
+    - name: Test setup
       id: build-simple
       uses: './'
       with:
@@ -24,19 +25,23 @@ jobs:
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64,linux/arm/v7
-    - name: Test building simple stack - validate
+    - name: Test execution
       run: |
         export repo=mrsimpson/unit-test-simple && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
-#####################################################################
-    - run: sudo rm -rf ./*
+
+
+  test-multi:
+    runs-on: ubuntu-latest
+
+    steps:
     - uses: actions/checkout@v2
     - name: Move tests to root folder, subfolders are not supported in uses
       run: |
         cp -Rf test/* .
-    - name: Test building multi-function stack - setup
+    - name: Test setup
       id: build-multi
       uses: './'
       with:
@@ -48,20 +53,24 @@ jobs:
         docker-password: ${{ secrets.DOCKER_PASSWORD }}
         # the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7
         platforms: linux/amd64
-    - name: Test building multi-function stack - validate first
+    - name: Test execution - validate first
       run: |
         export repo=mrsimpson/unit-test-first && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
-    - name: Test building multi-function stack - validate second
+    - name: Test execution - validate second
       run: |
         export repo=mrsimpson/unit-test-second && \
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
-#####################################################################
-    - run: sudo rm -rf ./*
+
+  build-and-push:
+
+    runs-on: ubuntu-latest
+
+    steps:
     - uses: actions/checkout@v2
     - name: Determine Image
       run: |
