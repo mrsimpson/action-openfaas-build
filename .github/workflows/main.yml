@@ -95,13 +95,16 @@ jobs:
       run: |
         for i in {1..10}
         do
-          GREP_RESULT=$(sudo systemctl status faasd | grep 'running')
-          if [ -z "$?" ]; then
+          if [ $(sudo systemctl status faasd | grep -c 'running') -eq 0 ]; then
             export RUNNING=true
             break
+          else 
+            date && echo no
+            export RUNNING=false
           fi
-          sleep 10s
+          sleep 5s
         done
+        $RUNNING && exit 0
     - name: Get OpenFaaS password
       run: |
         echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
