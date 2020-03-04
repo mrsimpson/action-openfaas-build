@@ -6,46 +6,61 @@
 # $4 platforms
 
 # Trigger the shrinkwrap
-BUILDING_MESSAGE=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep -i building | sed -n 2p)
+BUILDING_MESSAGES_STRING=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep 'Building:')
+SHRINKWRAP_MESSAGES_STRING=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep 'shrink-wrapped')
 
-# Determine the components of the image from the building message
-IMAGE_FULL=$(echo $BUILDING_MESSAGE | cut -d' ' -f2)
+mapfile -t SHRINKWRAP_MESSAGES <<< "$SHRINKWRAP_MESSAGES_STRING"
+mapfile -t BUILDING_MESSAGES <<< "$BUILDING_MESSAGES_STRING"
 
-SLASH_COUNT=$(tr -dc '/' <<<"$IMAGE_FULL" | awk '{ print length; }')
+INDEX=0
+for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
+    # Determine the components of the image by parsing the building message
+    IMAGE_FULL=$(echo $BUILDING_MESSAGE | cut -d' ' -f2)
 
-TAG=$(echo $IMAGE_FULL | rev | cut -f1 -d":" | rev) # part after last colon
-WITHOUT_TAG=$(echo $IMAGE_FULL | sed "s/:$TAG//")
-IMAGE=$(echo $WITHOUT_TAG | rev | cut -f1 -d"/" | rev) # part after last slash
-WITHOUT_IMAGE=$(echo $WITHOUT_TAG | sed "s/\/$IMAGE//")
-ORG=$(echo $WITHOUT_IMAGE| rev | cut -f1 -d"/" | rev) # part after last slash
+    SLASH_COUNT=$(tr -dc '/' <<<"$IMAGE_FULL" | awk '{ print length; }')
 
-if [ $SLASH_COUNT -gt 1 ]; then
-    REGISTRY=$(echo $WITHOUT_IMAGE | sed "s/\/$ORG//")
-else
-    REGISTRY=''
-fi
+    TAG=$(echo $IMAGE_FULL | rev | cut -f1 -d":" | rev) # part after last colon
+    WITHOUT_TAG=$(echo $IMAGE_FULL | sed "s/:$TAG//")
+    IMAGE=$(echo $WITHOUT_TAG | rev | cut -f1 -d"/" | rev) # part after last slash
+    WITHOUT_IMAGE=$(echo $WITHOUT_TAG | sed "s/\/$IMAGE//")
+    ORG=$(echo $WITHOUT_IMAGE| rev | cut -f1 -d"/" | rev) # part after last slash
 
-# For debugging purposes
-echo "All Arguments values:" $@
+    if [ $SLASH_COUNT -gt 1 ]; then
+        REGISTRY=$(echo $WITHOUT_IMAGE | sed "s/\/$ORG//")
+    else
+        REGISTRY=''
+    fi
+    
+    # Get mapping to functions and directories
+    SHRINKWRAP_MESSAGE=${SHRINKWRAP_MESSAGES[INDEX]}
+    FUNCTION=$(echo $SHRINKWRAP_MESSAGE | cut -d' ' -f1)
+    FOLDER=$(echo $SHRINKWRAP_MESSAGE | cut -d' ' -f4)
+    
+    # For debugging purposes
+    echo IMAGE_FULL=$IMAGE_FULL
+    echo REGISTRY=$REGISTRY
+    echo ORG=$ORG
+    echo IMAGE=$IMAGE
+    echo TAG=$TAG
+    echo FUNCTION=$FUNCTION
+    echo FOLDER=$FOLDER
 
-echo REGISTRY=$REGISTRY
-echo ORG=$ORG
-echo IMAGE=$IMAGE
-echo TAG=$TAG
+    # Authenticate
+    echo $3 | docker login -u $2 --password-stdin $REGISTRY
 
-# Authenticate
-echo $3 | docker login -u $2 --password-stdin $REGISTRY
+    # Build and push
 
-# Build and push
+    cd "${FOLDER}"
+    export DOCKER_CLI_EXPERIMENTAL=enabled
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    docker buildx create --use
+    docker buildx install
+    docker build --platform $4 -t $IMAGE_FULL --push .
 
-cd "build/$(ls build | sed -n p)"
-docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-docker buildx create --use
-docker buildx install
-docker build --platform $4 -t $IMAGE_FULL --push .
+    cd -
 
-# Propagate determined variables to the outer workflow
-echo ::set-output name=registry::$REGISTRY
-echo ::set-output name=org::$ORG
-echo ::set-output name=image::$IMAGE
+    ((INDEX++))
+done
+
+# TAG is the same across all function builds
 echo ::set-output name=tag::$TAG

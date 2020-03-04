@@ -6,10 +6,6 @@
 
 The function gets the image information from the function file.
 
-## 🌨⚡️ Limitations
-
-The app is currently not capable of building multi-images-functions, see [corresponding issue](https://github.com/mrsimpson/action-openfaas-build/issues/4)
-
 ## Inputs
 
 | Parameter | effect   | default |
