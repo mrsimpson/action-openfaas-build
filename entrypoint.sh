@@ -61,7 +61,7 @@ for BUILDING_MESSAGE in "${BUILDING_MESSAGES[@]}"; do
     docker build --platform $4 -t $IMAGE_FULL --push .
     cd -
 
-    INDEX=$((INDEX++))
+    INDEX=$((INDEX + 1))
 done
 # TAG is the same across all function builds
 echo ::set-output name=tag::$TAG
