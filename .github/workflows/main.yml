@@ -90,7 +90,7 @@ jobs:
         git clone https://github.com/openfaas/faasd && \
         cd faasd && \
         sudo faasd install && \
-        echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)
+        echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
     - run: |
         cp -Rf test/* .
     - name: Test setup - Build the function stack and deploy it
