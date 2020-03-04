@@ -4,10 +4,14 @@ on: [push]
 
 jobs:
 
-  test-simple:
-
+  docker-auth:
     runs-on: ubuntu-latest
+    steps:
+    - run: |
+          echo `::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ 'username': '${{ secrets.DOCKER_USERNAME }}', 'password': '${{ secrets.DOCKER_PASSWORD }}'}" "https://hub.docker.com/v2/users/login/" | jq -r .token)`
 
+  test-simple:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Move tests to root folder, subfolders are not supported in uses
@@ -32,10 +36,20 @@ jobs:
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
 
+  teardown-test-simple:
+    runs-on: ubuntu-latest
+    needs: [docker-auth, test-simple]
+    steps:
+      - run: |
+          echo `::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ 'username': '${{ secrets.DOCKER_USERNAME }}', 'password': '${{ secrets.DOCKER_PASSWORD }}'}" "https://hub.docker.com/v2/users/login/" | jq -r .token)`
+      - name: delete simple-image
+      - run: |
+          curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        env:
+          TAG: ${{ steps.test-simple.outputs.tag }}
 
   test-multi:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Move tests to root folder, subfolders are not supported in uses
@@ -65,11 +79,19 @@ jobs:
         curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
-
-  build-and-push:
-
+  
+  teardown-test-multi:
     runs-on: ubuntu-latest
-
+    needs: [docker-auth, test-multi]
+    steps:
+      - name: delete multi-image
+      - run: |
+          curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-multi/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        env:
+          TAG: ${{ steps.test-multi.outputs.tag }}
+  
+  build-and-push:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Determine Image
