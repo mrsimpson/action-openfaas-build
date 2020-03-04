@@ -95,13 +95,13 @@ jobs:
       run: |
         for i in {1..10}
         do
-          if [ $(sudo systemctl status faasd | grep 'running') -eq 0 ]; then
+          if [ "$(sudo systemctl status faasd | grep 'running')" -eq 0 ]; then
             export RUNNING=true
             break
           fi
           sleep 5s
         done
-        if [ $RUNNING -eq true ]; then
+        if [ "$RUNNING" ]; then
           exit 0
         else
           exit 1
