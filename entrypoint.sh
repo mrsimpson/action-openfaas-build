@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 # $1 stack-file
 # $2 docker-username
 # $3 docker-password
