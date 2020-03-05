@@ -146,11 +146,11 @@ jobs:
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
         code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD $OPENFAAS_GATEWAY/system/function/simple)
-        if[ $code -eq 200 -o $code -eq 405 ]; then
-          exit 0
+        if [ $code -eq 200 -o $code -eq 405 ]; then
+          exit 0;
         else
-          echo "Got HTTP code ${code}"
-          exit 1
+          echo "Got HTTP code ${code}";
+          exit 1;
         fi
   
   teardown-deployment:
@@ -158,15 +158,15 @@ jobs:
     if: always()
     needs: test-deploy
     steps:
-      - name: delete deployed function
-        run: |
-          code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions)
-          if[ $code -eq 200 -o $code -eq 405 ]; then
-            exit 0
-          else
-            echo "Got HTTP code ${code}"
-            exit 1
-          fi
+    - name: delete deployed function
+      run: |
+        code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions)
+        if [ $code -eq 200 -o $code -eq 405 ]; then
+          exit 0;
+        else
+          echo "Got HTTP code ${code}";
+          exit 1;
+        fi
 
   build-and-buffer:
     runs-on: ubuntu-latest
