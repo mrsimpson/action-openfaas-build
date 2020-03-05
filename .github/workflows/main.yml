@@ -15,6 +15,7 @@ env:
 jobs:
 
   test-simple:
+    if: false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -44,6 +45,7 @@ jobs:
         TAG: ${{ steps.build-simple.outputs.tag }}
 
   test-multi:
+    if: false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -164,6 +166,7 @@ jobs:
         fi
 
   build-and-buffer:
+    if: false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
