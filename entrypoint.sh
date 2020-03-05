@@ -68,7 +68,7 @@ done
 echo ::set-output name=tag::$TAG
 
 # Deploy function stack if requested
-if [ $5 -ne 0 ]; then
+if [ $5 = 'true' ]; then
 echo "Deploying function stack"
     echo $8 | faas-cli login -u $7 --password-stdin -g $6
     faas-cli deploy -f $1 --image $IMAGE_FULL --tag sha -g $6
