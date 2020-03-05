@@ -88,6 +88,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install faasd
       run: |
+        sudo curl --fail -fSLs "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd" --output "/usr/local/bin/faasd"
+        sudo chmod a+x "/usr/local/bin/faasd"
         export GOPATH=$HOME/go
         mkdir -p $GOPATH/src/github.com/openfaas
         cd $GOPATH/src/github.com/openfaas
@@ -95,7 +97,6 @@ jobs:
         sudo /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
-        sudo cp $GOPATH/src/github.com/openfaas/faasd/bin/faasd /usr/local/bin/
         cd $GOPATH/src/github.com/openfaas/faasd/ && sudo /usr/local/bin/faasd install
         sudo systemctl status -l containerd --no-pager
         sudo journalctl -u faasd-provider --no-pager
