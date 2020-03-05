@@ -85,7 +85,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install faasd
-      if: env.OPENFAAS_GATEWAY == ""
+      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
         sudo apt update
         sudo apt install -qy runc bridge-utils tmux git
@@ -104,7 +104,7 @@ jobs:
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
     - name: Wait for OpenFaaS to be ready
-      if: env.OPENFAAS_GATEWAY == ""
+      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
         for i in {1..10}
         do
@@ -119,7 +119,7 @@ jobs:
         done
         $RUNNING && exit 0
     - name: Get OpenFaaS password
-      if: env.OPENFAAS_GATEWAY == ""
+      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
         echo "FaasD status"
         sudo systemctl status faasd
