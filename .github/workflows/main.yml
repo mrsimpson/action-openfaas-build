@@ -102,6 +102,7 @@ jobs:
         sudo systemctl status -l faasd-provider --no-pager
         sudo systemctl status -l faasd --no-pager
         curl -sSLf https://cli.openfaas.com | sudo sh
+        sleep 120s && sudo systemctl status -l faasd --no-pager
     - name: Wait for OpenFaaS to be ready
       run: |
         for i in {1..10}
