@@ -22,8 +22,8 @@ jobs:
       uses: './'
       with:
         stack-file: './simple.yml'
-        docker-username: $DOCKER_USERNAME
-        docker-password: $DOCKER_PASSWORD
+        docker-username: ${{ env.DOCKER_USERNAME }}
+        docker-password: ${{ env.DOCKER_PASSWORD }}
         platforms: linux/amd64,linux/arm/v7
     - name: Test execution
       run: |
@@ -51,8 +51,8 @@ jobs:
       uses: './'
       with:
         stack-file: './multi-function.yml'
-        docker-username: $DOCKER_USERNAME
-        docker-password: $DOCKER_PASSWORD
+        docker-username: ${{ env.DOCKER_USERNAME }}
+        docker-password: ${{ env.DOCKER_PASSWORD }}
         platforms: linux/amd64
     - name: Test execution - validate first
       run: |
@@ -69,9 +69,6 @@ jobs:
     - name: Login to Dockerhub
       run: |
         echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: delete multi-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-first/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
@@ -136,13 +133,13 @@ jobs:
       uses: './'
       with:
         stack-file: './simple.yml'
-        docker-username: $DOCKER_USERNAME
-        docker-password: $DOCKER_PASSWORD
+        docker-username: ${{ env.DOCKER_USERNAME }}
+        docker-password: ${{ env.DOCKER_PASSWORD }}
         platforms: linux/amd64
         deploy: 1
-        gateway: $OPENFAAS_GATEWAY || http://localhost:8080
-        openfaas-username: $OPENFAAS_USERNAME|| admin
-        openfaas-password: $OPENFAAS_PASSWORD
+        gateway: ${{ env.OPENFAAS_GATEWAY || http://localhost:8080 }}
+        openfaas-username: ${{ env.OPENFAAS_USERNAME || admin }}
+        openfaas-password: ${{ env.OPENFAAS_PASSWORD }}
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
         curl -I http://admin:$OPENFAAS_PASSWORD@$OPENFAAS_GATEWAY/system/function/simple
