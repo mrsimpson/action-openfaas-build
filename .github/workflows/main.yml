@@ -98,7 +98,6 @@ jobs:
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
         cd $GOPATH/src/github.com/openfaas/faasd/ && sudo /usr/local/bin/faasd install
-        sudo systemctl status -l containerd --no-pager
         sudo journalctl -u faasd-provider --no-pager
         sudo systemctl status -l faasd-provider --no-pager
         sudo systemctl status -l faasd --no-pager
