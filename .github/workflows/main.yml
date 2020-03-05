@@ -92,7 +92,7 @@ jobs:
         cd faasd
         sudo faasd install
         sudo modprobe br_netfilter
-        sysctl net.bridge.bridge-nf-call-iptables=1
+        sudo sysctl net.bridge.bridge-nf-call-iptables=1
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
         sudo mkdir -p /opt/cni/bin
