@@ -23,10 +23,9 @@ inputs:
     description: 'Whether the built image shall be deployed (false=no, true=yes)'
     required: false
     default: 'false'
-  gateway:
-    description: 'The gateway url override'
+  openfaas-gateway:
+    description: 'OpenFaaS gateway URL (http(s)://my-public-gateway.tld)'
     required: false
-    default: '<fully qualified URL>'
   openfaas-username:
     description: 'User for authenticating at OpenFaaS gateway'
     required: false
@@ -34,11 +33,10 @@ inputs:
   openfaas-password:
     description: 'Password for authenticating at OpenFaaS gateway'
     required: false
-    default: 'admin'
   
 outputs:
   tag:
-    description: 'The image tag built'
+    description: 'Image tag built'
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -48,6 +46,6 @@ runs:
     - ${{ inputs.docker-password }}
     - ${{ inputs.platforms }}
     - ${{ inputs.deploy }}
-    - ${{ inputs.gateway }}
+    - ${{ inputs.openfaas-gateway }}
     - ${{ inputs.openfaas-username }}
     - ${{ inputs.openfaas-password }}

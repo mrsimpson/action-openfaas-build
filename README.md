@@ -22,7 +22,7 @@ If you really feel that you desperately need sommething, feel free to open an is
 | `docker-password` | Your docker registry's password | ❌ | yes |
 | `platforms` | The platform abbreviations to build for, potentially comma-separated. e. g. `linux/amd64,linux/arm/v7` | `linux/amd64` | yes |
 | `deploy` | Whether the built image shall be deployed | `false` | no |
-| `gateway` | The gateway url override. Only has an effect, if `deploy=true` |  | no |
+| `openfaas-gateway` | OpenFaaS gateway URL overriding the one given. Only has an effect, if `deploy=true` |  | no |
 | `openfaas-username` | User for authenticating at OpenFaaS gateway |  | no |
 | `openfaas-password`| Password for authenticating at OpenFaaS gateway |  | no |
 
