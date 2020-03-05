@@ -142,8 +142,16 @@ jobs:
         openfaas-password: ${{ env.OPENFAAS_PASSWORD }}
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
-        curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -I $OPENFAAS_GATEWAY/system/function/simple
+        curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD $OPENFAAS_GATEWAY/system/function/simple
   
+  teardown-deployment:
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: delete deployed function
+        run: |
+          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE $OPENFAAS_GATEWAY/system/function/simple | echo
+
   build-and-buffer:
     runs-on: ubuntu-latest
     steps:
