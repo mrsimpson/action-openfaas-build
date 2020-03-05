@@ -146,7 +146,8 @@ jobs:
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
         code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD $OPENFAAS_GATEWAY/system/function/simple)
-        if [ $code -eq 200 -o $code -eq 405 ]; then
+        if [ $code -eq 200 ]; then
+          echo "Exists! Got HTTP code ${code}";
           exit 0;
         else
           echo "Got HTTP code ${code}";
@@ -161,7 +162,8 @@ jobs:
     - name: delete deployed function
       run: |
         code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions)
-        if [ $code -eq 200 -o $code -eq 405 ]; then
+        if [ $code -eq 200 ]; then
+          echo "Deleted! Got HTTP code ${code}";
           exit 0;
         else
           echo "Got HTTP code ${code}";
