@@ -151,7 +151,7 @@ jobs:
     steps:
       - name: delete deployed function
         run: |
-          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -v $OPENFAAS_GATEWAY/system/function/simple
+          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions
 
   build-and-buffer:
     runs-on: ubuntu-latest
