@@ -85,30 +85,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install faasd
-      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
-        sudo apt update
-        sudo apt install -qy runc bridge-utils tmux git
-        sudo curl --fail -fSLs "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd" --output "/usr/local/bin/faasd"
-        sudo chmod a+x "/usr/local/bin/faasd"
-        export GOPATH=$HOME/go/
-        mkdir -p $GOPATH/src/github.com/openfaas
-        cd $GOPATH/src/github.com/openfaas
-        git clone https://github.com/openfaas/faasd
-        cd faasd
-        sudo faasd install
-        sudo modprobe br_netfilter
-        sudo sysctl net.bridge.bridge-nf-call-iptables=1
+        sudo /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
         sudo mkdir -p /opt/cni/bin
-        curl --fail -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
-        sudo mkdir -p /opt/cni/bin
-        curl --fail -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
+        curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
+        sudo cp $(GOPATH)/src/github.com/openfaas/faasd/bin/faasd /usr/local/bin/
+        cd $(GOPATH)/src/github.com/openfaas/faasd/ && sudo /usr/local/bin/faasd install
+        sudo systemctl status -l containerd --no-pager
+        sudo journalctl -u faasd-provider --no-pager
+        sudo systemctl status -l faasd-provider --no-pager
+        sudo systemctl status -l faasd --no-pager
+        curl -sSLf https://cli.openfaas.com | sudo sh
     - name: Wait for OpenFaaS to be ready
-      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
         for i in {1..10}
         do
-          if [ $(sudo systemctl status faasd | grep -c 'running') -eq 0 -a $(sudo systemctl status faasd-provider | grep -c 'running') -eq 0 ]; then
+          if [ $(sudo systemctl status -l faasd --no-pager | grep -c 'running') -eq 0 -a $(sudo systemctl status faasd-provider | grep -c 'running') -eq 0 ]; then
             export RUNNING=true
             break
           else 
@@ -119,7 +111,6 @@ jobs:
         done
         $RUNNING && exit 0
     - name: Get OpenFaaS password
-      if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
         echo "FaasD status"
         sudo systemctl status faasd
