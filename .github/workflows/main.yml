@@ -31,15 +31,15 @@ jobs:
     - name: Test execution
       run: |
         export repo=mrsimpson/unit-test-simple
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
+        curl --fail -H "Authorization: Bearer $(curl --fail -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo simple"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
     - name: Login to Dockerhub
       run: |
-        echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
+        echo "::set-env name=DOCKER_JWT::$(curl --fail -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
     - name: delete simple-image
       run: |
-        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        curl --fail "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
       env:
         TAG: ${{ steps.build-simple.outputs.tag }}
 
@@ -60,22 +60,22 @@ jobs:
     - name: Test execution - validate first
       run: |
         export repo=mrsimpson/unit-test-first
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
+        curl --fail -H "Authorization: Bearer $(curl --fail -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo first"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
     - name: Test execution - validate second
       run: |
         export repo=mrsimpson/unit-test-second
-        curl -H "Authorization: Bearer $(curl -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
+        curl --fail -H "Authorization: Bearer $(curl --fail -sSL "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${repo}:pull" | jq --raw-output .token)" "https://index.docker.io/v2/${repo}/manifests/${TAG}" | grep "fprocess=echo second"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
     - name: Login to Dockerhub
       run: |
-        echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
+        echo "::set-env name=DOCKER_JWT::$(curl --fail -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
     - name: delete multi-image
       run: |
-        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-first/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
-        curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-second/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        curl --fail "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-first/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
+        curl --fail "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-second/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
       env:
         TAG: ${{ steps.build-multi.outputs.tag }}
 
@@ -89,7 +89,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -qy runc bridge-utils tmux git
-        sudo curl -fSLs "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd" --output "/usr/local/bin/faasd"
+        sudo curl --fail -fSLs "https://github.com/openfaas/faasd/releases/download/0.8.0/faasd" --output "/usr/local/bin/faasd"
         sudo chmod a+x "/usr/local/bin/faasd"
         export GOPATH=$HOME/go/
         mkdir -p $GOPATH/src/github.com/openfaas
@@ -100,9 +100,9 @@ jobs:
         sudo modprobe br_netfilter
         sudo sysctl net.bridge.bridge-nf-call-iptables=1
         sudo mkdir -p /opt/cni/bin
-        curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
+        curl --fail -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
         sudo mkdir -p /opt/cni/bin
-        curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
+        curl --fail -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
     - name: Wait for OpenFaaS to be ready
       if: ${{ env.OPENFAAS_GATEWAY == '' }}
       run: |
@@ -139,22 +139,34 @@ jobs:
         docker-username: ${{ env.DOCKER_USERNAME }}
         docker-password: ${{ env.DOCKER_PASSWORD }}
         platforms: linux/amd64
-        deploy: 1
-        gateway: ${{ env.OPENFAAS_GATEWAY || 'http://localhost:8080' }}
+        deploy: true
+        openfaas-gateway: ${{ env.OPENFAAS_GATEWAY || 'http://localhost:8080' }}
         openfaas-username: ${{ env.OPENFAAS_USERNAME || 'admin' }}
         openfaas-password: ${{ env.OPENFAAS_PASSWORD }}
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
-        curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD $OPENFAAS_GATEWAY/system/function/simple
+        code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD $OPENFAAS_GATEWAY/system/function/simple)
+        if [ $code -eq 200 ]; then
+          exit 0;
+        else
+          echo "Got HTTP code ${code}";
+          exit 1;
+        fi
   
   teardown-deployment:
     runs-on: ubuntu-latest
     if: always()
     needs: test-deploy
     steps:
-      - name: delete deployed function
-        run: |
-          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions
+    - name: delete deployed function
+      run: |
+        code=$(curl --write-out %{http_code} --silent --output /dev/null -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -H "accept: application/json" -H "Content-Type: application/json" -d "{ \"functionName\": \"simple\"}" $OPENFAAS_GATEWAY/system/functions)
+        if [ $code -eq 202 ]; then
+          exit 0;
+        else
+          echo "Got HTTP code ${code}";
+          exit 1;
+        fi
 
   build-and-buffer:
     runs-on: ubuntu-latest
