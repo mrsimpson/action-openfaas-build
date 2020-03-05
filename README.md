@@ -1,8 +1,7 @@
 # OpenFaaS Github action
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-![CI](https://github.com/mrsimpson/action-openfaas-build/workflows/CI/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+![CI (build and test)](https://github.com/mrsimpson/action-openfaas-build/workflows/CI/badge.svg)
 
  A no-frills [Github action](https://help.github.com/en/actions/getting-started-with-github-actions) for building OpenFaaS functions.
 
