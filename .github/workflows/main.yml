@@ -86,7 +86,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install faasd
       run: |
-        export GOPATH=$HOME/go/
+        export GOPATH=$HOME/go
         mkdir -p $GOPATH/src/github.com/openfaas
         cd $GOPATH/src/github.com/openfaas
         git clone https://github.com/openfaas/faasd
