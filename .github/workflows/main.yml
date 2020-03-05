@@ -86,6 +86,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install faasd
       run: |
+        export GOPATH=$HOME/go/
+        mkdir -p $GOPATH/src/github.com/openfaas
+        cd $GOPATH/src/github.com/openfaas
+        git clone https://github.com/openfaas/faasd
         sudo /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
