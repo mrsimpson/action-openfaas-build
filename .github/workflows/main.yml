@@ -151,7 +151,7 @@ jobs:
     steps:
       - name: delete deployed function
         run: |
-          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE $OPENFAAS_GATEWAY/system/function/simple | echo
+          curl -u $OPENFAAS_USERNAME:$OPENFAAS_PASSWORD -X DELETE -v $OPENFAAS_GATEWAY/system/function/simple
 
   build-and-buffer:
     runs-on: ubuntu-latest
