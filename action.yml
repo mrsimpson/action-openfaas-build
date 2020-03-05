@@ -20,9 +20,9 @@ inputs:
     required: false
     default: 'linux/amd64'
   deploy:
-    description: 'Whether the built image shall be deployed (0=no, 1=yes)'
+    description: 'Whether the built image shall be deployed (false=no, true=yes)'
     required: false
-    default: '0'
+    default: 'false'
   gateway:
     description: 'The gateway url override'
     required: false
