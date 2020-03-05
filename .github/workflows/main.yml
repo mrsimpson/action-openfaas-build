@@ -107,6 +107,13 @@ jobs:
         $RUNNING && exit 0
     - name: Get OpenFaaS password
       run: |
+        echo "FaasD status"
+        sudo systemctl status faasd
+        sudo journalctl -u faasd --lines 40
+
+        echo "FaasD provider status"
+        sudo systemctl status faasd-provider
+        sudo journalctl -u faasd-provider --lines 40
         echo "::set-env name=OPENFAAS_PASSWORD::$(sudo cat /var/lib/faasd/secrets/basic-auth-password)"
     - run: |
         cp -Rf test/* .
