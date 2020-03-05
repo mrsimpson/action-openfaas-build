@@ -147,6 +147,7 @@ jobs:
   teardown-deployment:
     runs-on: ubuntu-latest
     if: always()
+    needs: test-deploy
     steps:
       - name: delete deployed function
         run: |
