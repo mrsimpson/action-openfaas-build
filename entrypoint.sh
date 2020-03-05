@@ -70,6 +70,15 @@ echo ::set-output name=tag::$TAG
 # Deploy function stack if requested
 if [ $5 -ne 0 ]; then
 echo "Deploying function stack"
+    echo "FaasD status"
+    sudo systemctl status faasd
+    sudo journalctl -u faasd --lines 40
+
+    echo "FaasD provider status"
+    sudo systemctl status faasd-provider
+    sudo journalctl -u faasd-provider --lines 40
+
+
     echo $8 | faas-cli login -u $7 --password-stdin -g $6
     faas-cli deploy -f $1 -g $6
 fi
