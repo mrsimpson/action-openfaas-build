@@ -2,6 +2,13 @@ name: CI
 
 on: [push]
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  OPENFAAS_GATEWAY: ${{ secrets.OPENFAAS_GATEWAY }}
+  OPENFAAS_USERNAME: ${{ secrets.OPENFAAS_USERNAME }}
+  OPENFAAS_PASSWORD: ${{ secrets.OPENFAAS_PASSWORD }}
+
 jobs:
 
   test-simple:
@@ -15,8 +22,8 @@ jobs:
       uses: './'
       with:
         stack-file: './simple.yml'
-        docker-username: ${{ secrets.DOCKER_USERNAME }}
-        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        docker-username: $DOCKER_USERNAME
+        docker-password: $DOCKER_PASSWORD
         platforms: linux/amd64,linux/arm/v7
     - name: Test execution
       run: |
@@ -27,9 +34,6 @@ jobs:
     - name: Login to Dockerhub
       run: |
         echo "::set-env name=DOCKER_JWT::$(curl -s -H "Content-Type: application/json" -X POST -d "{ \"username\": \"${DOCKER_USERNAME}\", \"password\": \"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)"
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     - name: delete simple-image
       run: |
         curl "https://hub.docker.com/v2/repositories/mrsimpson/unit-test-simple/tags/${TAG}/" -X DELETE -H "Authorization: JWT ${DOCKER_JWT}"
@@ -47,8 +51,8 @@ jobs:
       uses: './'
       with:
         stack-file: './multi-function.yml'
-        docker-username: ${{ secrets.DOCKER_USERNAME }}
-        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        docker-username: $DOCKER_USERNAME
+        docker-password: $DOCKER_PASSWORD
         platforms: linux/amd64
     - name: Test execution - validate first
       run: |
@@ -77,9 +81,11 @@ jobs:
 
   test-deploy:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v2
     - name: Install faasd
+      if: $OPENFAAS_GATEWAY == ""
       run: |
         sudo apt update
         sudo apt install -qy runc bridge-utils tmux git
@@ -98,6 +104,7 @@ jobs:
         sudo mkdir -p /opt/cni/bin
         curl -sSL https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-arm-v0.8.5.tgz | sudo tar -xz -C /opt/cni/bin
     - name: Wait for OpenFaaS to be ready
+      if: $OPENFAAS_GATEWAY == ""
       run: |
         for i in {1..10}
         do
@@ -112,6 +119,7 @@ jobs:
         done
         $RUNNING && exit 0
     - name: Get OpenFaaS password
+      if: $OPENFAAS_GATEWAY == ""
       run: |
         echo "FaasD status"
         sudo systemctl status faasd
@@ -128,16 +136,16 @@ jobs:
       uses: './'
       with:
         stack-file: './simple.yml'
-        docker-username: ${{ secrets.DOCKER_USERNAME }}
-        docker-password: ${{ secrets.DOCKER_PASSWORD }}
+        docker-username: $DOCKER_USERNAME
+        docker-password: $DOCKER_PASSWORD
         platforms: linux/amd64
         deploy: 1
-        gateway: http://localhost:8080
-        openfaas-username: admin
+        gateway: $OPENFAAS_GATEWAY || http://localhost:8080
+        openfaas-username: $OPENFAAS_USERNAME|| admin
         openfaas-password: $OPENFAAS_PASSWORD
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
-        curl -I http://admin:$OPENFAAS_PASSWORD@127.0.0.1:8080/system/function/simple
+        curl -I http://admin:$OPENFAAS_PASSWORD@$OPENFAAS_GATEWAY/system/function/simple
   
   build-and-buffer:
     runs-on: ubuntu-latest
