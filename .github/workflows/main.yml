@@ -137,8 +137,8 @@ jobs:
         docker-password: ${{ env.DOCKER_PASSWORD }}
         platforms: linux/amd64
         deploy: 1
-        gateway: ${{ env.OPENFAAS_GATEWAY || http://localhost:8080 }}
-        openfaas-username: ${{ env.OPENFAAS_USERNAME || admin }}
+        gateway: ${{ env.OPENFAAS_GATEWAY || 'http://localhost:8080' }}
+        openfaas-username: ${{ env.OPENFAAS_USERNAME || 'admin' }}
         openfaas-password: ${{ env.OPENFAAS_PASSWORD }}
     - name: Test execution - Check whether the function exists in OpenFaaS
       run: |
