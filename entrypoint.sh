@@ -3,18 +3,19 @@
 set -e
 set -o pipefail
 
-# $1 stack-file
-# $2 docker-username
-# $3 docker-password
-# $4 platforms
-# $5 deploy
-# $6 gateway
-# $7 openfaas-username
-# $8 openfaas-password
+STACK_FILE="$1"
+DOCKER_USERNAME="$2"
+DOCKER_PASSWORD="$3"
+PLATFORMS="$4"
+TAG_ALIAS="$5"
+DEPLOY="$6"
+GATEWAY="$7"
+OPENFAAS_USERNAME="$8"
+OPENFAAS_PASSWORD="$9"
 
 # Trigger the shrinkwrap
-BUILDING_MESSAGES_STRING=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep 'Building:')
-SHRINKWRAP_MESSAGES_STRING=$(faas-cli build -f $1 --shrinkwrap --tag sha | grep 'shrink-wrapped')
+BUILDING_MESSAGES_STRING=$(faas-cli build -f $STACK_FILE --shrinkwrap --tag sha | grep 'Building:')
+SHRINKWRAP_MESSAGES_STRING=$(faas-cli build -f $STACK_FILE --shrinkwrap --tag sha | grep 'shrink-wrapped')
 
 mapfile -t SHRINKWRAP_MESSAGES <<< "$SHRINKWRAP_MESSAGES_STRING"
 mapfile -t BUILDING_MESSAGES <<< "$BUILDING_MESSAGES_STRING"
@@ -48,11 +49,12 @@ for i in "${!BUILDING_MESSAGES[@]}"; do
     echo ORG=$ORG
     echo IMAGE=$IMAGE
     echo TAG=$TAG
+    echo TAG_ALIAS=$TAG_ALIAS
     echo FUNCTION=$FUNCTION
     echo FOLDER=$FOLDER
 
 # Authenticate
-    echo $3 | docker login -u $2 --password-stdin $REGISTRY
+    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $REGISTRY
 
 # Build and push docker image
     cd "${FOLDER}"
@@ -60,7 +62,12 @@ for i in "${!BUILDING_MESSAGES[@]}"; do
     docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
     docker buildx create --use
     docker buildx install
-    docker build --platform $4 -t $IMAGE_FULL --push .
+    if [ ! -z $TAG_ALIAS ]; then
+        ALIAS="${WITHOUT_TAG}:${TAG_ALIAS}"
+        docker build --platform $PLATFORMS -t $IMAGE_FULL -t $ALIAS --push .
+    else
+        docker build --platform $PLATFORMS -t $IMAGE_FULL --push .
+    fi
     cd -
 done
 
@@ -68,13 +75,13 @@ done
 echo ::set-output name=tag::$TAG
 
 # Deploy function stack if requested
-if [ $5 = 'true' ]; then
-echo "Deploying function stack"
-    if [ -z $6 ]; then
-        echo $8 | faas-cli login -u $7 --password-stdin
-        faas-cli deploy -f $1 --image $IMAGE_FULL --tag sha
+if [ $DEPLOY = 'true' ]; then
+    echo "Deploying function stack"
+    if [ -z $GATEWAY ]; then
+        echo $OPENFAAS_PASSWORD | faas-cli login -u $OPENFAAS_USERNAME --password-stdin
+        faas-cli deploy -f STACK_FILE --image $IMAGE_FULL --tag sha
     else
-        echo $8 | faas-cli login -u $7 --password-stdin -g $6
-        faas-cli deploy -f $1 --image $IMAGE_FULL --tag sha -g $6
+        echo $OPENFAAS_PASSWORD | faas-cli login -u $OPENFAAS_USERNAME --password-stdin -g $GATEWAY
+        faas-cli deploy -f STACK_FILE --image $IMAGE_FULL --tag sha -g $GATEWAY
     fi
 fi

@@ -19,8 +19,11 @@ inputs:
     description: 'the platform abbreviations to build for, e. g. linux/amd64,linux/arm/v7'
     required: false
     default: 'linux/amd64'
+  tag-alias:
+    description: 'the tag used to alias docker images, e.g. latest, main etc.'
+    required: false
   deploy:
-    description: 'Whether the built image shall be deployed (false=no, true=yes)'
+    description: 'Whether the built image shall be deployed (true/false)'
     required: false
     default: 'false'
   openfaas-gateway:
@@ -45,6 +48,7 @@ runs:
     - ${{ inputs.docker-username }}
     - ${{ inputs.docker-password }}
     - ${{ inputs.platforms }}
+    - ${{ inputs.tag-alias }}
     - ${{ inputs.deploy }}
     - ${{ inputs.openfaas-gateway }}
     - ${{ inputs.openfaas-username }}
