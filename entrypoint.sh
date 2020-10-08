@@ -79,9 +79,9 @@ if [ $DEPLOY = 'true' ]; then
     echo "Deploying function stack"
     if [ -z $GATEWAY ]; then
         echo $OPENFAAS_PASSWORD | faas-cli login -u $OPENFAAS_USERNAME --password-stdin
-        faas-cli deploy -f STACK_FILE --image $IMAGE_FULL --tag sha
+        faas-cli deploy -f "$STACK_FILE" --image $IMAGE_FULL --tag sha
     else
         echo $OPENFAAS_PASSWORD | faas-cli login -u $OPENFAAS_USERNAME --password-stdin -g $GATEWAY
-        faas-cli deploy -f STACK_FILE --image $IMAGE_FULL --tag sha -g $GATEWAY
+        faas-cli deploy -f "$STACK_FILE" --image $IMAGE_FULL --tag sha -g $GATEWAY
     fi
 fi
